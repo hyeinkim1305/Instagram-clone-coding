@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container d-flex flex-column align-items-center">
+    <div class="row g-4">
+      <div class="col-8">
+        {% for article in articles %}
+          <!--게시글-->
+          <div class="card w-100 mt-5">
+            <!--작성한 유저-->
+            <div class="card-header bg-transparent">
+              <a href="{% url 'accounts:profile' article.user.username %}" class="text-decoration-none text-dark"><b>{{ article.user }}</b></a>
+            </div>
+            <!--이미지와 글-->
+            <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.image }}">
+            
+            <!--좋아요, 댓글-->
+            <div class="card-body">
+              <form action="{% url 'articles:like' article.pk %}" method="POST">
+                {% csrf_token %}
+                {% if request.user in article.like_users.all %}
+                  <button class="btn" style="color: white"><i class="fas fa-heart" style="color: crimson"></i></button>
+                {% else %}
+                  <button class="btn" style="color: white"><i class="far fa-heart" style="color: black"></i></button>
+              
+                {% endif %}
+                <p><b>좋아요 {{ article.like_users.all|length }}개</b></p>
+              </form>
+              <p><b>{{ article.user }}</b> {{ article.content }}</p>
+              {% for comment in article.comment_set.all %}
+                <li>
+                  {{ comment.user }} - {{ comment.content }}
+                  {% if request.user == comment.user %}
+                    <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="submit" value="DELETE">
+                    </form>
+                  {% endif %}
+                </li>
+              {% empty %}
+                <p>아직 댓글이 없네요...</p>
+              <!--댓글작성-->
+
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+<!--댓글작성 저기에 들어가야함 -->
+{% if request.user.is_authenticated %}
+    <form action="{% url 'articles:comments_create' article.pk %}" method="POST">
+      {% csrf_token %}
+      {{ comment_form }}
+      <input type="submit">
+    </form>
+  {% else %}
+    <a href="{% url 'accounts:login' %}">[댓글을 작성하려면 로그인 하세요.]</a>
+  {% endif %}
+
+
+      <!--게시글 옆에 추천기능-->
+      <div class="col-4">
+        <div class="card w-100 mt-5" >
+          <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+{% endblock %}
+
