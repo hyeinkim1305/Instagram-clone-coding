@@ -47,7 +47,7 @@
         {% endfor %}
       </div>
 
-<!--댓글작성 저기에 들어가야함 -->
+{% comment %} <!--댓글작성 저기에 들어가야함 -->
 {% if request.user.is_authenticated %}
     <form action="{% url 'articles:comments_create' article.pk %}" method="POST">
       {% csrf_token %}
@@ -56,7 +56,7 @@
     </form>
   {% else %}
     <a href="{% url 'accounts:login' %}">[댓글을 작성하려면 로그인 하세요.]</a>
-  {% endif %}
+  {% endif %} {% endcomment %}
 
 
       <!--게시글 옆에 추천기능-->
